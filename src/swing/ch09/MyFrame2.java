@@ -1,26 +1,30 @@
 package swing.ch09;
 
 import javax.swing.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public class MyFrame extends JFrame implements KeyListener {
+public class MyFrame2 extends JFrame {
 
     private JLabel backgroundMap;
     private JLabel player;
 
-    private final int MOVE_STEP = 10;
-    ImageIcon playerIconr = new ImageIcon("image/playerR.png");
-    ImageIcon playerIconl = new ImageIcon("image/playerL.png");
-    ImageIcon playerIconld = new ImageIcon("image/playerLDie.png");
-    ImageIcon playerIconrd = new ImageIcon("image/playerRDie.png");
+    // 플레이어의 왼쪽 방향 이미지
+    ImageIcon playerIconL = new ImageIcon("image/playerL.png");
+    ImageIcon playerIconR = new ImageIcon("image/playerR.png");
 
-    public MyFrame() {
+    private final int MOVE_STEP = 10;
+    // 이동 가능한 범위
+    private final int MAX_X = 1000 - 100; // 900
+    private final int MAX_Y = 600 - 100;  // 500
+    // MIN_X, MIN_Y == 0
+    private final int MIN_POS = 0;
+
+    public MyFrame2() {
         initData();
         setInitLayout();
         addEventListener();
     }
-
 
     private void initData() {
         setTitle("이미지 사용 연습");
@@ -34,79 +38,67 @@ public class MyFrame extends JFrame implements KeyListener {
         backgroundMap.setLocation(0, 0);
 
         // 플레이어 설정
-
-//        ImageIcon playerIconld = new ImageIcon("playerLDie.png");
-//        ImageIcon playerIconrd = new ImageIcon("playerRDie.png");
-
-        player = new JLabel(playerIconr);
-        player = new JLabel(playerIconl);
-
-
+        player = new JLabel(playerIconL); // 초기 상태 값
         player.setSize(100, 100);
-
         player.setLocation(200, 200);
-
 
     }
 
     private void setInitLayout() {
         setLayout(null); // 좌표 기반
         backgroundMap.add(player);
-
-//        backgroundMap.add(player3);
-//        backgroundMap.add(player4);
         add(backgroundMap);
         setVisible(true);
-
-
     }
 
     private void addEventListener() {
-        this.addKeyListener(this);
-        this.setFocusable(true);
-        this.requestFocusInWindow();
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int x = player.getX();
+                int y = player.getY();
+
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        y -= MOVE_STEP;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        player.setIcon(playerIconL);
+                        x -= MOVE_STEP;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        y += MOVE_STEP;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        player.setIcon(playerIconR);
+                        x += MOVE_STEP;
+                        break;
+                    default:
+                        return;
+                }
+
+                // 배경 밖으로 나가지 않도록 범위 제한
+                //                             1100 , 900
+                //             0     ,          900
+                x = Math.max(MIN_POS, Math.min(x, MAX_X));
+                y = Math.max(MIN_POS, Math.min(y, MAX_Y));
+
+                player.setLocation(x, y);
+            } // end of keypressed
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+        // 추천 옵션 - 필수
+        setFocusable(true);
+        requestFocusInWindow();
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    public void keyPressed(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-
-        int x = player.getX(); // 현재 자신의 x 좌표값을 반환
-
-        // 현재 자신의 x 좌표값을 반환
-        int y = player.getY(); // 현재 자신의 y 좌표값을 반환
-
-        // 방향키 코드값에 따라 새로운 좌표 설정
-        if (keyCode == KeyEvent.VK_LEFT) {
-            player.setIcon(playerIconl);
-            player.setLocation(x - MOVE_STEP, y);
-        } else if (keyCode == KeyEvent.VK_UP) {
-            player.setIcon(playerIconld);
-            player.setLocation(x, y - MOVE_STEP);
-        } else if (keyCode == KeyEvent.VK_RIGHT) {
-            player.setIcon(playerIconr);
-            player.setLocation(x + MOVE_STEP, y);
-        } else if (keyCode == KeyEvent.VK_DOWN) {
-            player.setIcon(playerIconrd);
-            player.setLocation(x, y + MOVE_STEP);
-        }
-
-
-        // 테스트 코드 (메인 쓰레드)
-
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
-
+    // 테스트 코드 (메인 쓰레드)
     public static void main(String[] args) {
-        new MyFrame();
+        new MyFrame2();
     }
+
 }

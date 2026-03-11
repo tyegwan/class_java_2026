@@ -95,6 +95,15 @@ public class MyFrame extends JFrame implements KeyListener {
             player.setLocation(x, y + MOVE_STEP);
         }
 
+        if(player.getX()<0){
+            x = 0;
+        }
+
+        if(player.getX() > 900){
+            x= 900;
+        }
+
+        player.setLocation(x, y);
 
         // 테스트 코드 (메인 쓰레드)
 
